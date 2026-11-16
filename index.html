@@ -1,0 +1,842 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="description" content="Langit: From Zero to CEO adalah game simulasi kehidupan tentang mengejar impian, membangun karier, dan menciptakan masa depan di Bangkok.">
+<meta name="author" content="Langit Game Studio">
+<meta name="theme-color" content="#203c32">
+<meta name="color-scheme" content="dark light">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Langit">
+<meta name="mobile-web-app-capable" content="yes">
+<meta property="og:type" content="game">
+<meta property="og:title" content="Langit — From Zero to CEO">
+<meta property="og:description" content="Jalani kehidupan Langit dan bangun masa depan di Bangkok.">
+<meta property="og:locale" content="id_ID">
+<meta property="og:site_name" content="Langit Game Studio">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Langit — From Zero to CEO">
+<meta name="twitter:description" content="Game simulasi kehidupan Langit.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23203c32'/%3E%3Cpath d='M12 42 32 12 52 42 32 35Z' fill='%23e5bd77'/%3E%3C/svg%3E">
+<title>Langit — From Zero to CEO</title>
+
+<style>
+:root{
+ --forest:#203c32;
+ --forest2:#315747;
+ --cream:#f0e9d8;
+ --paper:#e5dcc8;
+ --gold:#d8ae68;
+ --ink:#26372f;
+ --muted:#9aab9d;
+ --red:#a95e50;
+ --line:rgba(230,220,196,.2);
+ --panel:rgba(27,48,40,.96);
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{
+ background:#182e27;color:var(--cream);
+ font-family:Georgia,"Times New Roman",serif;
+ font-size:16px;touch-action:manipulation;
+ -webkit-text-size-adjust:100%;
+ -webkit-tap-highlight-color:transparent;
+ user-select:none;-webkit-user-select:none;
+ -webkit-touch-callout:none;
+}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+button:disabled{opacity:.4;cursor:not-allowed}
+#app{height:100vh;height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+header{
+ min-height:66px;padding:8px 16px;
+ display:flex;align-items:center;justify-content:space-between;
+ gap:12px;background:#1b332b;border-bottom:1px solid var(--line);
+ z-index:5;
+}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-mark{font-size:29px;color:var(--gold)}
+.brand h1{font-size:19px;letter-spacing:1px;margin:0}
+.brand small{display:block;font:10px monospace;color:#c3bda9;letter-spacing:2px}
+.top-info{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.pill{border:1px solid var(--line);padding:7px 10px;border-radius:20px;font-size:12px;color:#f1e6cf}
+#main{display:flex;flex:1;min-height:0;position:relative}
+#world-wrap{flex:1;position:relative;min-width:0;background:#a7b39a;overflow:hidden}
+canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+#hud{
+ position:absolute;left:14px;top:14px;width:min(230px,48%);
+ background:rgba(27,48,40,.92);padding:13px;border:1px solid #82917a;
+ border-radius:4px;pointer-events:none;
+}
+#hud h2{font-size:16px;margin:0 0 8px;color:var(--gold)}
+.stat{margin:7px 0}
+.statline{display:flex;justify-content:space-between;font:11px monospace;margin-bottom:4px}
+.bar{height:6px;background:#46584d;border-radius:8px;overflow:hidden}
+.bar span{height:100%;display:block;background:var(--gold);width:50%;transition:width .2s}
+#location-label{
+ position:absolute;bottom:14px;left:14px;
+ background:rgba(27,48,40,.9);padding:9px 14px;
+ border-left:3px solid var(--gold);font-size:13px;
+}
+#sidebar{
+ width:270px;flex-shrink:0;background:#203b31;
+ border-left:1px solid var(--line);padding:14px;
+ overflow-y:auto;display:flex;flex-direction:column;gap:12px;
+}
+.section-title{font-size:11px;letter-spacing:2px;color:var(--gold);margin:0 0 8px;text-transform:uppercase}
+.panel{border-bottom:1px solid var(--line);padding-bottom:12px}
+button.action{
+ background:#e2d5b9;color:#273b31;border:0;
+ padding:11px 12px;min-height:44px;text-align:left;
+ width:100%;font-size:13px;margin:3px 0;
+ transition:background .15s,transform .15s;
+}
+button.action:hover{background:#f3e8ce;transform:translateY(-1px)}
+button.action:active{transform:scale(.98)}
+button.secondary{background:#385749;color:#f0e9d8}
+button.secondary:hover{background:#4b6b59}
+button.gold{background:var(--gold);color:#26372f}
+button.danger{background:#814b42;color:#fff}
+#mission{font-size:13px;line-height:1.5;color:#e5dfce}
+#message{
+ position:absolute;left:50%;top:18px;transform:translateX(-50%);
+ background:#203c32;border:1px solid var(--gold);
+ padding:12px 18px;max-width:85%;text-align:center;
+ z-index:8;font-size:13px;opacity:0;pointer-events:none;
+ transition:opacity .2s;border-radius:3px;
+}
+#message.show{opacity:1}
+#controls{
+ position:absolute;bottom:22px;right:18px;
+ display:grid;grid-template-columns:repeat(3,48px);
+ grid-template-rows:repeat(2,48px);gap:5px;
+ z-index:4;
+}
+#controls button{
+ background:rgba(31,59,48,.9);color:#f4e8cf;
+ border:1px solid #b7a77e;border-radius:8px;
+ font-size:20px;min-width:44px;min-height:44px;
+ touch-action:none;
+}
+#controls button:active{background:#a98b56}
+#controls .up{grid-column:2}
+#controls .left{grid-column:1;grid-row:2}
+#controls .down{grid-column:2;grid-row:2}
+#controls .right{grid-column:3;grid-row:2}
+#controls .interact{grid-column:1/4;grid-row:3;font-size:13px;margin-top:5px}
+#overlay{
+ position:absolute;inset:0;background:rgba(12,26,21,.82);
+ z-index:10;display:flex;align-items:center;justify-content:center;
+ padding:16px;overflow-y:auto;
+}
+#overlay.hidden{display:none}
+.dialog{
+ width:min(560px,100%);max-height:90%;overflow:auto;
+ background:#e9e0cd;color:#26372f;padding:28px;
+ border:1px solid #c6a46c;box-shadow:12px 12px 0 rgba(0,0,0,.2);
+}
+.dialog h2{font-size:30px;margin:0 0 7px}
+.dialog p{line-height:1.55;font-size:14px}
+.dialog .sub{color:#66766a;font:11px monospace;letter-spacing:2px}
+.dialog button{margin-top:7px}
+.dialog input,.dialog select{
+ display:block;width:100%;padding:13px;font-size:16px;
+ background:#f8f2e6;border:1px solid #a7a08d;
+ color:#26372f;margin:9px 0;
+}
+.dialog button.action{background:#315747;color:#f6eddc}
+.dialog button.gold{background:#d8ae68;color:#26372f}
+#toast-area{position:absolute;bottom:12px;left:12px;z-index:8}
+#footer{
+ background:#192e27;border-top:1px solid var(--line);
+ padding:7px 14px;display:flex;justify-content:space-between;
+ gap:10px;font:10px monospace;color:#b8c1b5;
+}
+#mobile-nav{display:none}
+@media(max-width:900px){
+ #sidebar{width:225px}
+}
+@media(max-width:650px){
+ header{min-height:58px;padding:7px 10px}
+ .brand h1{font-size:15px}
+ .brand small{font-size:8px}
+ .top-info{gap:5px}
+ .pill{font-size:10px;padding:6px}
+ #main{flex-direction:column}
+ #world-wrap{flex:1;min-height:0}
+ #sidebar{
+ width:100%;height:145px;flex-direction:row;
+ overflow-x:auto;overflow-y:hidden;border-left:0;
+ border-top:1px solid var(--line);padding:9px;gap:14px;
+ }
+ #sidebar .panel{min-width:155px;border:0;border-right:1px solid var(--line);padding-right:12px}
+ #hud{width:160px;padding:9px;left:8px;top:8px}
+ #hud h2{font-size:13px}
+ #hud .stat{margin:5px 0}
+ #hud .statline{font-size:9px}
+ #location-label{bottom:8px;left:8px;font-size:11px}
+ #controls{right:10px;bottom:10px;grid-template-columns:repeat(3,43px);grid-template-rows:repeat(2,43px)}
+ #controls button{font-size:17px}
+ #footer{font-size:9px}
+}
+@media(max-width:380px){
+ .brand-mark{display:none}
+ .top-info .pill:nth-child(2){display:none}
+ #sidebar{height:130px}
+ #hud{width:145px}
+ .dialog{padding:19px}
+}
+@media(orientation:landscape) and (max-height:500px){
+ header{min-height:48px}
+ #sidebar{width:190px}
+ #hud{top:6px}
+ #controls{bottom:7px}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+ <div class="brand">
+  <div class="brand-mark" aria-hidden="true">✦</div>
+  <div><h1>LANGIT</h1><small>FROM ZERO TO CEO</small></div>
+ </div>
+ <div class="top-info">
+  <div class="pill" id="clock">07:00 · PAGI</div>
+  <div class="pill" id="money">฿ 100</div>
+  <div class="pill" id="level">LEVEL 1</div>
+  <button class="action secondary" style="width:auto;margin:0" id="menuBtn">☰ Menu</button>
+ </div>
+</header>
+
+<main id="main">
+ <section id="world-wrap" aria-label="Dunia permainan">
+  <canvas id="world" draggable="false" aria-label="Dunia Langit. Gunakan tombol arah untuk bergerak."></canvas>
+  <div id="hud" aria-live="polite">
+   <h2>LANGIT</h2>
+   <div class="stat"><div class="statline"><span>ENERGI</span><b id="energyText">100</b></div><div class="bar"><span id="energyBar"></span></div></div>
+   <div class="stat"><div class="statline"><span>LAPAR</span><b id="hungerText">20</b></div><div class="bar"><span id="hungerBar"></span></div></div>
+   <div class="stat"><div class="statline"><span>KEBAHAGIAAN</span><b id="happyText">70</b></div><div class="bar"><span id="happyBar"></span></div></div>
+   <div class="stat"><div class="statline"><span>KEBERSIHAN</span><b id="cleanText">90</b></div><div class="bar"><span id="cleanBar"></span></div></div>
+   <div class="stat"><div class="statline"><span>KEMAMPUAN VOKAL</span><b id="skillText">0</b></div><div class="bar"><span id="skillBar"></span></div></div>
+  </div>
+  <div id="location-label">Rumah Sederhana · Bangkok</div>
+  <div id="message" role="status" aria-live="polite"></div>
+  <div id="controls" aria-label="Kontrol sentuh">
+   <button class="up" data-move="up" aria-label="Bergerak ke atas">↑</button>
+   <button class="left" data-move="left" aria-label="Bergerak ke kiri">←</button>
+   <button class="down" data-move="down" aria-label="Bergerak ke bawah">↓</button>
+   <button class="right" data-move="right" aria-label="Bergerak ke kanan">→</button>
+   <button class="interact" id="touchInteract">INTERAKSI · E</button>
+  </div>
+ </section>
+
+ <aside id="sidebar">
+  <section class="panel">
+   <h2 class="section-title">Perjalanan Langit</h2>
+   <div id="mission">Mulailah dengan berlatih bernyanyi dan membangun kemampuan.</div>
+   <div class="bar" style="margin-top:9px"><span id="xpBar"></span></div>
+   <small id="xpText">0 / 100 XP</small>
+  </section>
+  <section class="panel">
+   <h2 class="section-title">Aktivitas</h2>
+   <button class="action" id="singBtn">♫ Latihan Bernyanyi</button>
+   <button class="action" id="jobBtn">▣ Kerja Sampingan</button>
+   <button class="action" id="restBtn">⌂ Istirahat</button>
+   <button class="action" id="eatBtn">◈ Makan</button>
+  </section>
+  <section class="panel">
+   <h2 class="section-title">Kehidupan</h2>
+   <button class="action secondary" id="socialBtn">♡ Temui Teman</button>
+   <button class="action secondary" id="shopBtn">◇ Toko Fashion</button>
+   <button class="action secondary" id="homeBtn">⌂ Rumah</button>
+   <button class="action secondary" id="careerBtn">✦ Karier & Bisnis</button>
+  </section>
+ </aside>
+</main>
+
+<footer id="footer">
+ <span id="footerLocation">BANGKOK · THAILAND</span>
+ <span>WASD / PANAH · E INTERAKSI · P PAUSE</span>
+</footer>
+
+<div id="overlay">
+ <div class="dialog" id="dialog">
+  <div class="sub">LANGIT GAME STUDIO PRESENTS</div>
+  <h2>From Zero<br>to CEO.</h2>
+  <p>Setiap mimpi besar dimulai dari langkah kecil. Hari ini, Langit memulai kehidupannya di Bangkok dengan uang terbatas dan impian yang tidak terbatas.</p>
+  <p><b>Jadilah Langit. Tentukan jalan hidupmu sendiri.</b></p>
+  <label for="playerName">Nama pemain</label>
+  <input id="playerName" maxlength="18" placeholder="Masukkan nama pemain" autocomplete="nickname">
+  <button class="action gold" id="startBtn">MULAI KEHIDUPAN →</button>
+  <button class="action" id="loadBtn">LANJUTKAN PERMAINAN</button>
+  <button class="action secondary" id="howBtn">CARA BERMAIN</button>
+  <p class="sub">SIMPANAN PERANGKAT · VERSI 1.0</p>
+ </div>
+</div>
+
+</div>
+
+<script>
+"use strict";
+
+/* LANGIT — satu file, tanpa aset eksternal */
+
+const $ = id => document.getElementById(id);
+const canvas = $("world");
+const ctx = canvas.getContext("2d");
+
+const SAVE_KEY = "app_v1_state";
+const WORLD_W = 1100;
+const WORLD_H = 760;
+const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+
+const levels = [
+ {name:"BEGINNING",goal:"Latihan vokal 3 kali dan kumpulkan ฿150.",test:s=>s.skill>=3&&s.money>=150,reward:100},
+ {name:"THE DREAMER",goal:"Tingkatkan vokal ke 8 dan kunjungi studio.",test:s=>s.skill>=8&&s.studioVisits>=1,reward:250},
+ {name:"FIRST OPPORTUNITY",goal:"Ikuti audisi dan dapatkan kesempatan pertama.",test:s=>s.audition&&s.skill>=12,reward:500},
+ {name:"RISING STAR",goal:"Selesaikan proyek lagu dan dapatkan popularitas.",test:s=>s.projects>=1&&s.fame>=20,reward:900},
+ {name:"FASHION ENTREPRENEUR",goal:"Kumpulkan modal dan buka bisnis fashion.",test:s=>s.business&&s.money>=500,reward:1500},
+ {name:"YOUNG CEO",goal:"Kembangkan perusahaan dan capai reputasi 60.",test:s=>s.business&&s.fame>=60&&s.money>=2000,reward:2500},
+ {name:"THE FINAL CHAPTER",goal:"Bangun hubungan yang kuat dan selesaikan perjalanan.",test:s=>s.relationship>=100&&s.fame>=80,reward:5000}
+];
+
+const freshState = () => ({
+ version:1,player:"Pemain",started:false,
+ x:520,y:430,location:"Rumah Sederhana",
+ money:100,xp:0,level:0,
+ energy:100,hunger:20,happy:70,clean:90,
+ skill:0,fame:0,relationship:0,
+ day:1,hour:7,minute:0,
+ studioVisits:0,audition:false,projects:0,business:false,
+ friends:0,clothes:0,homeUpgrade:0,
+ paused:false,mute:true,
+ onboarding:false,achievements:[],
+});
+let S=freshState();
+let screen="menu";
+let lastTime=0,raf=0,saveTimer=0,messageTimer=0;
+let move={up:false,down:false,left:false,right:false};
+let activePointers=new Map();
+let audio=null;
+let lastInteract=0;
+let quality=true;
+let camera={x:0,y:0};
+let objects=[];
+let weather="cerah";
+
+function safeSave(){
+ try{
+  const copy={...S,paused:false};
+  localStorage.setItem(SAVE_KEY,JSON.stringify(copy));
+ }catch(e){notify("Penyimpanan penuh atau tidak tersedia. Hapus data lama melalui menu.");}
+}
+function safeLoad(){
+ try{
+  const raw=localStorage.getItem(SAVE_KEY);
+  if(!raw)return false;
+  const data=JSON.parse(raw);
+  if(!data||data.version!==1||typeof data.money!=="number"||typeof data.level!=="number")return false;
+  S={...freshState(),...data,paused:false};
+  S.level=clamp(Math.floor(S.level),0,6);
+  return true;
+ }catch(e){
+  notify("Data simpanan tidak terbaca. Mulai permainan baru.");
+  return false;
+ }
+}
+function resetSave(){
+ if(!confirm("Hapus seluruh perkembangan Langit di perangkat ini?"))return;
+ try{localStorage.removeItem(SAVE_KEY);}catch(e){}
+ S=freshState();showMenu();
+}
+function notify(text){
+ const el=$("message");el.textContent=text;el.classList.add("show");
+ clearTimeout(messageTimer);
+ messageTimer=setTimeout(()=>el.classList.remove("show"),2500);
+}
+function sound(freq=440,duration=.09){
+ if(S.mute)return;
+ try{
+  if(!audio)audio=new (window.AudioContext||window.webkitAudioContext)();
+  if(audio.state==="suspended")audio.resume();
+  const o=audio.createOscillator(),g=audio.createGain();
+  o.frequency.value=freq;o.type="sine";
+  g.gain.setValueAtTime(.045,audio.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);
+  o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+duration);
+ }catch(e){}
+}
+function addXP(n){
+ S.xp+=n;
+ while(S.xp>=100&&S.level<6){
+  S.xp-=100;S.level++;
+  S.money+=levels[S.level-1].reward;
+  notify("LEVEL NAIK! "+levels[S.level-1].name+" · Bonus ฿"+levels[S.level-1].reward);
+  sound(660,.2);
+ }
+}
+function checkProgress(){
+ while(S.level<6&&levels[S.level].test(S)){
+  const next=S.level+1;
+  S.level=next;
+  S.money+=levels[next-1].reward;
+  notify("Bab baru terbuka: "+levels[next-1].name);
+  addXP(20);
+ }
+ if(S.level===6&&levels[6].test(S)&&!S.achievements.includes("ending")){
+  S.achievements.push("ending");
+  showEnding();
+ }
+}
+function updateUI(){
+ $("money").textContent="฿ "+Math.floor(S.money).toLocaleString("id-ID");
+ $("level").textContent="LEVEL "+(S.level+1);
+ $("clock").textContent=String(S.hour).padStart(2,"0")+":"+String(S.minute).padStart(2,"0")+" · "+(S.hour<11?"PAGI":S.hour<15?"SIANG":S.hour<18?"SORE":"MALAM");
+ const stats=[["energy",S.energy],["hunger",S.hunger],["happy",S.happy],["clean",S.clean],["skill",Math.min(100,S.skill*5)]];
+ for(const [id,v] of stats){
+  $(id+"Bar").style.width=clamp(v,0,100)+"%";
+  $(id+"Text").textContent=Math.floor(v);
+ }
+ $("xpBar").style.width=S.xp+"%";
+ $("xpText").textContent=S.xp+" / 100 XP";
+ $("mission").textContent="LEVEL "+(S.level+1)+" · "+levels[S.level].name+"\n"+levels[S.level].goal;
+ $("location-label").textContent=S.location+" · Bangkok";
+ $("footerLocation").textContent="BANGKOK · HARI "+S.day;
+}
+function setLocation(name,x,y){
+ S.location=name;S.x=x;S.y=y;notify("Kamu tiba di "+name+".");updateUI();safeSave();
+}
+function spend(cost){
+ if(S.money<cost){notify("Uang belum cukup. Cari penghasilan melalui kerja sampingan.");return false;}
+ S.money-=cost;return true;
+}
+function tickMinutes(m){
+ S.minute+=m;
+ while(S.minute>=60){S.minute-=60;S.hour++;if(S.hour>=24){S.hour=0;S.day++;}}
+ S.hunger=clamp(S.hunger+m*.025,0,100);
+ S.energy=clamp(S.energy-m*.012,0,100);
+ S.clean=clamp(S.clean-m*.009,0,100);
+ S.happy=clamp(S.happy-m*.004,0,100);
+ if(S.hunger>90)S.energy=clamp(S.energy-2,0,100);
+ updateUI();
+}
+function activity(type){
+ if(screen!=="playing")return;
+ try{
+  if(type==="sing"){
+   if(S.energy<12){notify("Langit terlalu lelah. Istirahat dahulu.");return;}
+   S.skill++;S.energy-=12;S.happy+=3;addXP(18);tickMinutes(45);
+   notify("Latihan selesai. Kemampuan vokal meningkat!");
+  }
+  if(type==="job"){
+   if(S.energy<10){notify("Energi terlalu rendah untuk bekerja.");return;}
+   S.money+=65;S.energy-=15;S.happy-=3;addXP(12);tickMinutes(90);
+   notify("Pekerjaan selesai. Kamu mendapat ฿65.");
+  }
+  if(type==="rest"){
+   S.energy=clamp(S.energy+45,0,100);S.happy=clamp(S.happy+5,0,100);tickMinutes(90);
+   notify("Langit beristirahat. Energi mulai pulih.");
+  }
+  if(type==="eat"){
+   if(!spend(20))return;
+   S.hunger=clamp(S.hunger-35,0,100);S.happy=clamp(S.happy+4,0,100);tickMinutes(25);
+   notify("Makan selesai. Perut Langit lebih nyaman.");
+  }
+  if(type==="social"){
+   if(S.energy<5){notify("Istirahat dahulu sebelum bertemu teman.");return;}
+   S.relationship=clamp(S.relationship+12,0,100);S.happy=clamp(S.happy+12,0,100);S.friends++;tickMinutes(45);addXP(10);
+   notify("Obrolan menyenangkan. Hubungan semakin dekat.");
+  }
+  if(type==="shower"){
+   S.clean=100;S.energy=clamp(S.energy-3,0,100);tickMinutes(20);notify("Langit selesai mandi.");
+  }
+  if(type==="sleep"){
+   S.energy=100;S.hunger=clamp(S.hunger+15,0,100);S.clean=clamp(S.clean-8,0,100);
+   S.hour=7;S.minute=0;S.day++;notify("Hari baru dimulai. Selamat pagi, Langit!");
+  }
+  if(type==="audition"){
+   if(S.level<2||S.skill<12){notify("Perlu kemampuan vokal 12 dan bab First Opportunity.");return;}
+   S.audition=true;S.fame+=12;S.money+=250;addXP(40);tickMinutes(120);
+   notify("Audisi berhasil! Perusahaan hiburan tertarik pada Langit.");
+  }
+  if(type==="project"){
+   if(S.level<3||S.skill<15){notify("Kembangkan kemampuan vokal sebelum mengambil proyek.");return;}
+   S.projects++;S.fame+=15;S.money+=450;addXP(35);tickMinutes(180);
+   notify("Proyek lagu selesai. Namamu mulai dikenal!");
+  }
+  if(type==="business"){
+   if(S.level<4){notify("Kamu perlu mencapai bab Fashion Entrepreneur.");return;}
+   if(!spend(500))return;
+   S.business=true;S.money+=100;S.fame+=5;addXP(50);tickMinutes(120);
+   notify("Merek fashion Langit resmi dibuka!");
+  }
+  if(type==="sell"){
+   if(!S.business){notify("Bangun bisnis fashion terlebih dahulu.");return;}
+   S.money+=180;S.fame+=2;addXP(18);tickMinutes(60);notify("Penjualan toko hari ini menghasilkan ฿180.");
+  }
+  if(type==="relationship"){
+   S.relationship=clamp(S.relationship+18,0,100);S.happy=clamp(S.happy+8,0,100);addXP(15);tickMinutes(50);
+   notify("Kamu meluangkan waktu bersama seseorang yang selalu mendukungmu.");
+  }
+  checkProgress();updateUI();safeSave();
+ }catch(e){notify("Aktivitas tidak berhasil. Coba lagi.");}
+}
+function buildObjects(){
+ objects=[
+  {x:130,y:155,w:150,h:105,type:"home",name:"Rumah Sederhana"},
+  {x:405,y:115,w:175,h:115,type:"studio",name:"Studio Musik"},
+  {x:755,y:140,w:175,h:115,type:"company",name:"Perusahaan Hiburan"},
+  {x:170,y:475,w:170,h:110,type:"cafe",name:"Kafe Bangkok"},
+  {x:470,y:500,w:170,h:110,type:"shop",name:"Toko Fashion"},
+  {x:795,y:475,w:170,h:110,type:"park",name:"Taman Kota"}
+ ];
+}
+function resize(){
+ const r=canvas.getBoundingClientRect();
+ const dpr=Math.min(window.devicePixelRatio||1,2);
+ canvas.width=Math.max(1,Math.round(r.width*dpr));
+ canvas.height=Math.max(1,Math.round(r.height*dpr));
+ ctx.setTransform(1,0,0,1,0,0);
+ ctx.scale(dpr,dpr);
+}
+function drawBuilding(o){
+ const x=o.x,y=o.y;
+ const colors={home:"#b9a17d",studio:"#8c9b8c",company:"#879b91",cafe:"#c58c65",shop:"#c1a16d",park:"#769a73"};
+ ctx.fillStyle="rgba(35,48,36,.2)";
+ ctx.beginPath();ctx.ellipse(x+o.w/2,y+o.h+23,o.w*.63,17,0,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle=colors[o.type];
+ ctx.beginPath();ctx.moveTo(x,y+28);ctx.lineTo(x+o.w/2,y);ctx.lineTo(x+o.w,y+28);ctx.lineTo(x+o.w,y+o.h);ctx.lineTo(x,y+o.h);ctx.closePath();ctx.fill();
+ ctx.fillStyle="#4b6251";
+ ctx.fillRect(x+o.w*.12,y+o.h*.4,o.w*.22,o.h*.35);
+ ctx.fillRect(x+o.w*.65,y+o.h*.4,o.w*.22,o.h*.35);
+ ctx.fillStyle="#e3d0a9";
+ ctx.fillRect(x+o.w*.42,y+o.h*.57,o.w*.17,o.h*.43);
+ ctx.fillStyle="#f3e6c9";ctx.font="bold 12px Georgia";ctx.textAlign="center";
+ ctx.fillText(o.name,x+o.w/2,y+o.h+18);
+}
+function drawWorld(){
+ if(!ctx)return;
+ const w=canvas.clientWidth,h=canvas.clientHeight;
+ ctx.clearRect(0,0,w,h);
+ ctx.fillStyle="#aab99b";ctx.fillRect(0,0,w,h);
+ const scale=Math.min(w/1050,h/720);
+ const ox=(w-WORLD_W*scale)/2,oy=(h-WORLD_H*scale)/2;
+ ctx.save();ctx.translate(ox,oy);ctx.scale(scale,scale);
+ // Jalan kota
+ ctx.fillStyle="#d2c7aa";ctx.fillRect(0,335,WORLD_W,95);
+ ctx.fillRect(355,0,80,WORLD_H);
+ ctx.fillStyle="#c3b89c";ctx.fillRect(0,370,WORLD_W,4);
+ ctx.strokeStyle="#f0e5c9";ctx.setLineDash([20,16]);ctx.lineWidth=3;
+ ctx.beginPath();ctx.moveTo(0,383);ctx.lineTo(WORLD_W,383);ctx.stroke();ctx.setLineDash([]);
+ // Tanah dan taman
+ ctx.fillStyle="#8ca17d";
+ for(let i=0;i<12;i++){
+  ctx.beginPath();ctx.arc((i*137)%WORLD_W,(i*197)%WORLD_H,22,0,Math.PI*2);ctx.fill();
+ }
+ // Sungai dekoratif
+ ctx.fillStyle="#8caeaa";ctx.fillRect(0,665,WORLD_W,95);
+ ctx.fillStyle="#d9c9a7";ctx.fillRect(0,650,WORLD_W,14);
+ objects.forEach(drawBuilding);
+ // Lampu jalan
+ for(let i=0;i<6;i++){
+  const x=70+i*190;
+  ctx.fillStyle="#586a53";ctx.fillRect(x,300,5,44);
+  ctx.fillStyle="#f2d68d";ctx.beginPath();ctx.arc(x+2,298,8,0,Math.PI*2);ctx.fill();
+ }
+ // Player
+ const px=S.x,py=S.y;
+ ctx.fillStyle="rgba(25,42,30,.24)";
+ ctx.beginPath();ctx.ellipse(px,py+16,13,6,0,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle="#d2a27b";ctx.beginPath();ctx.arc(px,py-16,10,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle="#293b35";ctx.beginPath();ctx.arc(px,py-19,10,Math.PI,Math.PI*2);ctx.fill();
+ ctx.fillStyle="#d6bd82";ctx.fillRect(px-9,py-6,18,25);
+ ctx.fillStyle="#314b40";ctx.fillRect(px-10,py+15,8,12);ctx.fillRect(px+2,py+15,8,12);
+ ctx.fillStyle="#fff4d8";ctx.font="bold 13px Georgia";ctx.textAlign="center";ctx.fillText("LANGIT",px,py+44);
+ // Cuaca
+ if(weather==="hujan"){
+  ctx.strokeStyle="rgba(220,238,236,.45)";ctx.lineWidth=1;
+  for(let i=0;i<60;i++){let x=(i*73+S.minute*7)%WORLD_W,y=(i*47+S.hour*5)%WORLD_H;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-4,y+12);ctx.stroke();}
+ }
+ // Warna malam
+ if(S.hour>=18||S.hour<6){ctx.fillStyle="rgba(22,35,49,.38)";ctx.fillRect(0,0,WORLD_W,WORLD_H);}
+ ctx.restore();
+}
+function movePlayer(dt){
+ if(screen!=="playing"||S.paused)return;
+ let dx=(move.right?1:0)-(move.left?1:0);
+ let dy=(move.down?1:0)-(move.up?1:0);
+ if(dx||dy){
+  const mag=Math.hypot(dx,dy);dx/=mag;dy/=mag;
+  const speed=155;
+  const nx=clamp(S.x+dx*speed*dt,25,1070);
+  const ny=clamp(S.y+dy*speed*dt,45,635);
+  S.x=nx;S.y=ny;
+ }
+}
+function loop(t){
+ raf=requestAnimationFrame(loop);
+ if(!lastTime)lastTime=t;
+ const dt=Math.min((t-lastTime)/1000,.05);lastTime=t;
+ if(screen==="playing"&&!S.paused){
+  movePlayer(dt);
+  saveTimer+=dt;
+  if(saveTimer>8){safeSave();saveTimer=0;}
+ }
+ drawWorld();
+}
+function nearestObject(){
+ let best=null,dist=Infinity;
+ for(const o of objects){
+  const d=Math.hypot(S.x-(o.x+o.w/2),S.y-(o.y+o.h/2));
+  if(d<dist){dist=d;best=o;}
+ }
+ return dist<150?best:null;
+}
+function interact(){
+ if(screen!=="playing"||S.paused)return;
+ const o=nearestObject();
+ if(!o){notify("Tidak ada tempat untuk berinteraksi di dekat sini.");return;}
+ if(o.type==="home")openHome();
+ if(o.type==="studio"){
+  S.studioVisits++;activity("sing");
+  notify("Studio musik: latihan vokal dan rekaman.");
+ }
+ if(o.type==="company")openCareer();
+ if(o.type==="cafe")activity("eat");
+ if(o.type==="shop")openShop();
+ if(o.type==="park")activity("social");
+}
+function openDialog(title,desc,buttons){
+ const d=$("dialog");
+ d.innerHTML="";
+ const sub=document.createElement("div");sub.className="sub";sub.textContent="KEHIDUPAN LANGIT";
+ const h=document.createElement("h2");h.textContent=title;
+ const p=document.createElement("p");p.textContent=desc;
+ d.append(sub,h,p);
+ buttons.forEach(b=>{
+  const btn=document.createElement("button");
+  btn.className="action "+(b.gold?"gold":"");
+  btn.textContent=b.label;
+  btn.onclick=()=>{if(b.fn)b.fn();};
+  d.append(btn);
+ });
+ $("overlay").classList.remove("hidden");
+}
+function closeDialog(){$("overlay").classList.add("hidden");}
+function openHome(){
+ openDialog("Rumah Langit","Tempat beristirahat, menjaga kebersihan, dan memulihkan tenaga.",[
+  {label:"Mandi · Pulihkan kebersihan",fn:()=>{closeDialog();activity("shower");}},
+  {label:"Tidur sampai pagi",gold:true,fn:()=>{closeDialog();activity("sleep");}},
+  {label:"Upgrade rumah · ฿300",fn:()=>{if(spend(300)){S.homeUpgrade++;addXP(20);notify("Rumah menjadi lebih nyaman.");}closeDialog();}},
+  {label:"Kembali",fn:closeDialog}
+ ]);
+}
+function openShop(){
+ openDialog("Butik Bangkok","Pilih penampilan Langit. Setiap pembelian menjadi bagian dari koleksi pribadinya.",[
+  {label:"Pakaian kasual · ฿80",fn:()=>{if(spend(80)){S.clothes++;S.happy=clamp(S.happy+8,0,100);addXP(8);notify("Langit mendapat pakaian baru.");}closeDialog();}},
+  {label:"Pakaian panggung · ฿150",fn:()=>{if(spend(150)){S.clothes++;S.fame+=3;addXP(12);notify("Penampilan panggung baru didapatkan.");}closeDialog();}},
+  {label:"Aksesori · ฿45",fn:()=>{if(spend(45)){S.clothes++;addXP(5);notify("Aksesori baru masuk koleksi.");}closeDialog();}},
+  {label:"Kembali",fn:closeDialog}
+ ]);
+}
+function openCareer(){
+ const buttons=[];
+ if(S.level>=2)buttons.push({label:"Ikuti audisi",gold:true,fn:()=>{closeDialog();activity("audition");}});
+ if(S.level>=3)buttons.push({label:"Kerjakan proyek lagu",fn:()=>{closeDialog();activity("project");}});
+ if(S.level>=4)buttons.push({label:"Bangun perusahaan fashion · ฿500",fn:()=>{closeDialog();activity("business");}});
+ if(S.business)buttons.push({label:"Kelola penjualan toko",fn:()=>{closeDialog();activity("sell");}});
+ buttons.push({label:"Kembali",fn:closeDialog});
+ openDialog("Karier & Perusahaan","Karier Langit berkembang melalui latihan, kesempatan, dan keputusan yang tepat. Tingkatkan kemampuan sebelum mengambil pekerjaan besar.",buttons);
+}
+function showEnding(){
+ openDialog("THE FINAL CHAPTER","Langit telah mencapai banyak hal. Dari rumah sederhana, panggung kecil, studio rekaman, hingga perusahaan fashion miliknya sendiri. Namun, keberhasilan yang paling berarti bukan hanya angka dan ketenaran. Ada seseorang yang menyaksikan setiap langkahnya sejak awal. Mereka memilih untuk tetap saling mendukung dan membangun masa depan dengan cara mereka sendiri. Perjalanan ini bukan tentang menjadi sempurna, melainkan tentang tidak menyerah pada impian.",[
+  {label:"Rayakan perjalanan Langit",gold:true,fn:()=>{closeDialog();notify("Akhir cerita tercapai. Kamu masih bebas menjelajahi kota!");}},
+  {label:"Kembali ke permainan",fn:closeDialog}
+ ]);
+}
+function showMenu(){
+ screen="menu";S.paused=true;
+ openDialog("LANGIT · MENU","Atur kehidupan dan perjalanan Langit.",[
+  {label:"Lanjut bermain",gold:true,fn:resumeGame},
+  {label:"Cara bermain",fn:showHow},
+  {label:"Pengaturan",fn:showSettings},
+  {label:"Simpan permainan",fn:()=>{safeSave();notify("Perkembangan tersimpan.");}},
+  {label:"Reset data permainan",fn:resetSave},
+  {label:"Tutup menu",fn:resumeGame}
+ ]);
+}
+function showHow(){
+ openDialog("Cara Bermain","Jelajahi Bangkok menggunakan WASD atau tombol panah. Dekati bangunan lalu tekan E atau tombol INTERAKSI. Gunakan aktivitas untuk memenuhi kebutuhan dan meningkatkan kemampuan. Selesaikan tujuan setiap level untuk membuka bab berikutnya. Kontrol keyboard: ESC/P untuk jeda, M untuk suara, F untuk layar penuh, R untuk mulai ulang setelah konfirmasi. Di Android gunakan tombol arah di layar.",[
+  {label:"Mengerti",gold:true,fn:()=>{if(screen==="menu")showMenu();else resumeGame();}}
+ ]);
+}
+function showSettings(){
+ openDialog("Pengaturan","Suara: "+(S.mute?"mati":"aktif")+". Perubahan disimpan di perangkat.",[
+  {label:"Suara: "+(S.mute?"Aktifkan":"Matikan"),fn:()=>{S.mute=!S.mute;safeSave();showSettings();}},
+  {label:"Cuaca: "+weather,fn:()=>{weather=weather==="cerah"?"hujan":"cerah";showSettings();}},
+  {label:"Kembali",gold:true,fn:showMenu}
+ ]);
+}
+function startGame(name){
+ S=freshState();S.player=name||"Pemain";S.started=true;S.onboarding=true;
+ screen="playing";S.paused=false;closeDialog();
+ buildObjects();setLocation("Rumah Sederhana",205,290);
+ notify("Hari pertama Langit dimulai. Mari kejar impianmu!");
+ safeSave();updateUI();
+}
+function resumeGame(){
+ if(!S.started){startGame($("playerName").value.trim());return;}
+ screen="playing";S.paused=false;closeDialog();
+ if(audio&&audio.state==="suspended")audio.resume().catch(()=>{});
+ requestWakeLock();updateUI();
+}
+let wakeLock=null;
+async function requestWakeLock(){
+ try{if("wakeLock" in navigator)wakeLock=await navigator.wakeLock.request("screen");}catch(e){}
+}
+function releaseWakeLock(){try{if(wakeLock){wakeLock.release();wakeLock=null;}}catch(e){}}
+function pauseGame(){
+ if(screen!=="playing")return;
+ S.paused=true;releaseWakeLock();
+ if(audio&&audio.state==="running")audio.suspend().catch(()=>{});
+ openDialog("Permainan Dijeda","Langit sedang beristirahat. Perkembangan permainan akan tetap tersimpan.",[
+  {label:"Lanjutkan",gold:true,fn:resumeGame},
+  {label:"Simpan permainan",fn:()=>{safeSave();notify("Permainan tersimpan.");}},
+  {label:"Pengaturan",fn:showSettings},
+  {label:"Keluar ke menu",fn:showMenu}
+ ]);
+}
+function restartGame(){
+ if(!confirm("Mulai ulang perjalanan Langit? Data saat ini akan diganti."))return;
+ startGame(S.player);
+}
+function toggleFullscreen(){
+ try{
+  if(!document.fullscreenElement)document.documentElement.requestFullscreen?.().catch(()=>notify("Layar penuh tidak didukung browser ini."));
+  else document.exitFullscreen?.();
+ }catch(e){notify("Layar penuh tidak tersedia di perangkat ini.");}
+}
+function handleKey(e){
+ if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();
+ const k=e.key.toLowerCase();
+ if(k==="escape"||k==="p"){if(screen==="playing"&&!S.paused)pauseGame();else if(S.paused)resumeGame();return;}
+ if(k==="m"){S.mute=!S.mute;safeSave();notify("Suara "+(S.mute?"dimatikan":"diaktifkan"));return;}
+ if(k==="f"){toggleFullscreen();return;}
+ if(k==="r"){restartGame();return;}
+ if(k==="e"||k==="enter"){interact();return;}
+ if(k==="arrowup"||k==="w")move.up=true;
+ if(k==="arrowdown"||k==="s")move.down=true;
+ if(k==="arrowleft"||k==="a")move.left=true;
+ if(k==="arrowright"||k==="d")move.right=true;
+}
+function releaseKeys(){move={up:false,down:false,left:false,right:false};activePointers.clear();}
+function bindMoveButton(btn){
+ const dir=btn.dataset.move;
+ btn.addEventListener("pointerdown",e=>{
+  e.preventDefault();btn.setPointerCapture?.(e.pointerId);
+  activePointers.set(e.pointerId,dir);move[dir]=true;
+  sound(280,.04);
+ });
+ const release=e=>{
+  activePointers.delete(e.pointerId);
+  move[dir]=[...activePointers.values()].includes(dir);
+ };
+ btn.addEventListener("pointerup",release);
+ btn.addEventListener("pointercancel",release);
+ btn.addEventListener("lostpointercapture",release);
+}
+function showMenuFromWelcome(){
+ openDialog("LANGIT — FROM ZERO TO CEO","Selamat datang. Kamu akan menentukan bagaimana Langit menjalani kehidupannya.",[
+  {label:"Mulai baru",gold:true,fn:()=>startGame($("playerName").value.trim())},
+  {label:"Cara bermain",fn:showHow}
+ ]);
+}
+
+// Tombol dan kontrol
+$("startBtn").onclick=()=>startGame($("playerName").value.trim());
+$("loadBtn").onclick=()=>{
+ if(safeLoad()){
+  S.started=true;screen="playing";buildObjects();closeDialog();
+  updateUI();notify("Selamat datang kembali, "+S.player+"!");
+ }else notify("Belum ada simpanan permainan yang bisa dilanjutkan.");
+};
+$("howBtn").onclick=showHow;
+$("menuBtn").onclick=()=>screen==="playing"?pauseGame():showMenu();
+$("touchInteract").onclick=interact;
+$("singBtn").onclick=()=>activity("sing");
+$("jobBtn").onclick=()=>activity("job");
+$("restBtn").onclick=()=>activity("rest");
+$("eatBtn").onclick=()=>activity("eat");
+$("socialBtn").onclick=()=>activity("social");
+$("shopBtn").onclick=openShop;
+$("homeBtn").onclick=openHome;
+$("careerBtn").onclick=openCareer;
+
+document.querySelectorAll("[data-move]").forEach(bindMoveButton);
+window.addEventListener("keydown",handleKey);
+window.addEventListener("keyup",e=>{
+ const k=e.key.toLowerCase();
+ if(k==="arrowup"||k==="w")move.up=false;
+ if(k==="arrowdown"||k==="s")move.down=false;
+ if(k==="arrowleft"||k==="a")move.left=false;
+ if(k==="arrowright"||k==="d")move.right=false;
+});
+window.addEventListener("blur",()=>{releaseKeys();if(screen==="playing"&&!S.paused)pauseGame();});
+document.addEventListener("visibilitychange",()=>{
+ if(document.hidden){releaseKeys();if(screen==="playing"&&!S.paused)pauseGame();}
+ else if(audio&&audio.state==="suspended"&&screen==="playing"&&!S.paused){audio.resume().catch(()=>{});}
+});
+canvas.addEventListener("contextmenu",e=>e.preventDefault());
+canvas.addEventListener("dragstart",e=>e.preventDefault());
+canvas.addEventListener("pointerdown",e=>{
+ if(screen!=="playing"||S.paused)return;
+ const rect=canvas.getBoundingClientRect();
+ const scale=Math.min(rect.width/1050,rect.height/720);
+ const ox=(rect.width-WORLD_W*scale)/2,oy=(rect.height-WORLD_H*scale)/2;
+ const x=(e.clientX-rect.left-ox)/scale,y=(e.clientY-rect.top-oy)/scale;
+ const dx=x-S.x,dy=y-S.y;
+ if(Math.hypot(dx,dy)>40){
+  S.x=clamp(x,25,1070);S.y=clamp(y,45,635);
+ }
+});
+let resizeTimer;
+window.addEventListener("resize",()=>{
+ clearTimeout(resizeTimer);resizeTimer=setTimeout(resize,180);
+});
+if(window.visualViewport)window.visualViewport.addEventListener("resize",()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(resize,180);});
+window.addEventListener("popstate",()=>{
+ if(screen==="playing"&&!S.paused)pauseGame();
+ history.pushState({game:true},"",location.href);
+});
+try{history.pushState({game:true},"",location.href);}catch(e){}
+window.addEventListener("beforeunload",e=>{
+ if(screen==="playing"&&!S.paused){safeSave();e.preventDefault();e.returnValue="";}
+});
+window.addEventListener("pagehide",safeSave);
+
+// Inisialisasi
+function init(){
+ buildObjects();resize();updateUI();
+ const loaded=safeLoad();
+ if(loaded){
+  $("playerName").value=S.player;
+  $("loadBtn").textContent="LANJUTKAN · LEVEL "+(S.level+1);
+ }
+ requestAnimationFrame(loop);
+}
+try{init();}catch(e){
+ $("dialog").innerHTML="<h2>Permainan tidak dapat dimulai</h2><p>Browser mengalami kendala saat memuat dunia Langit. Coba buka kembali halaman ini menggunakan Chrome terbaru.</p>";
+ $("overlay").classList.remove("hidden");
+}
+</script>
+</body>
+</html>
